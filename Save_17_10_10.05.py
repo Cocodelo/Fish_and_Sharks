@@ -56,48 +56,19 @@ class Ocean :
             mapsList.append([img])
         anim = animation.ArtistAnimation(fig,mapsList,interval=100,blit=True,repeat=False)
         plt.show()
-
     def surroundings(self,pos):
-        #avec un liste[-1,1], on peut raccourcir ça
         d={0:[0,[]],1:[0,[]],2:[0,[]]}
-        if self.grid[pos[0]][pos[1]-1]==None:
-            d[0][0]+=1
-            d[0][1].append((pos[0],pos[1]-1))
-        else:
-                for i in range(0,3):
-                    if self.grid[pos[0]][pos[1]-1].num==i:
+        l=((pos[0],pos[1]-1),(pos[0],pos[1]+1),(pos[0]-1,pos[1]),(pos[0]+1,pos[1]))
+        for i in range(len(l)):
+            if self.grid[l[0][i]][l[1][i]]==None:
+                d[0][0]+=1
+                d[0][1].append(l[i])
+            else:
+                for j in range(0,3):
+                    if self.grid[l[0][i]][l[1][i]].num==i:
                         d[i][0]+=1
-                        d[i][1].append((pos[0],pos[1]-1))
-
-        if self.grid[pos[0]][pos[1]+1]==None:
-            d[0][0]+=1
-            d[0][1].append((pos[0],pos[1]+1))
-        else:
-            for i in range(0,3):
-                if self.grid[pos[0]][pos[1]+1].num==i:
-                    d[i][0]+=1
-                    d[i][1].append((pos[0],pos[1]+1))
-
-        if self.grid[pos[0]-1][pos[1]]==None:
-            d[0][0]+=1
-            d[0][1].append((pos[0]-1,pos[1]))
-        else:
-            for i in range(0,3):
-                if self.grid[pos[0]-1][pos[1]].num==i:
-                    d[i][0]+=1
-                    d[i][1].append((pos[0]-1,pos[1]))
-
-        if self.grid[pos[0]+1][pos[1]]==None:
-            d[0][0]+=1
-            d[0][1].append((pos[0]+1,pos[1]))
-        else:
-            for i in range(0,3):
-                if self.grid[pos[0]+1][pos[1]].num==i:
-                    d[i][0]+=1
-                    d[i][1].append((pos[0]+1,pos[1]))
+                        d[i][1].append(l[i])
         return d
-
-
     def removeDeads(self):
         pass
         # complete here (remove pass)
