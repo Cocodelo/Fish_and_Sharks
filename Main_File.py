@@ -70,8 +70,10 @@ class Ocean :
                         d[i][1].append(l[i])
         return d
     def removeDeads(self):
-        pass
-        # complete here (remove pass)
+        for i in range(0,len(self.animals)):
+            if not self.animals(i).alive:
+                self.animals.pop(i)
+            
 
     def tick(self):
         rd.shuffle(self.animals)
@@ -109,7 +111,7 @@ class Animal :
             oldpos=self.pos
         self.pos=(d[cellType][a])
         if self.rep==self.reproductionTreshold:
-            reproduce(self,ocean,oldpos)
+            self.reproduce(self,ocean,oldpos)
         else:
             ocean.grid[oldpos[0]][oldpos[1]]==None
 
@@ -128,22 +130,24 @@ class Fish(Animal):
 ###
 
 class Shark(Animal):
-    start_energy=3
+    
     maximum_energy=6
-
-
+    energy_start=3
     num = 2
 
     reproductionTreshold = 12
     def __init__(self,x,y):
-        self.energy=start_energy
+
+        self.energy=self.energy_start
         super().__init__(x,y)
 
 
 
-ocean=Ocean()
+ocean=Ocean(10,10)
 ocean.initialize()
 print(ocean)
+nemo=Shark(1,1)
+print(nemo.energy)
 
 
 
