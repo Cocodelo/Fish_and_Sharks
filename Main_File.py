@@ -32,30 +32,32 @@ class Ocean :
     def initialize(self):
         for i in range(0,self.height):
             for j in range(0,self.width):
-                if rd.randint(0,9)<=0:
+                r=rd.randint(0,9)
+                if r<=0:
                     self.grid[i][j]=Shark(i,j)
                     self.animals.append(self.grid[i][j])
-                elif rd.randint(0,9)>=6:
+                elif r>=6:
                     self.grid[i][j]=Fish(i,j)
                     self.animals.append(self.grid[i][j])
         self.states.append(copyMat(self.grid))
         self.animalCount.append(self.count())
 
     def show(self):
-        # used for the animation do not touch !
-        fig = plt.figure(1)
-        mapsList = []
-        for k in range(len(self.states)):
-            for i in range(self.width):
-                for j in range(self.height):
-                    if self.states[k][i][j] == None :
-                        self.states[k][i][j] = colorTable[0]
-                    else :
-                        self.states[k][i][j] = colorTable[self.states[k][i][j].num]
-            img = plt.matshow(self.states[k],fignum=1)
-            mapsList.append([img])
-        anim = animation.ArtistAnimation(fig,mapsList,interval=100,blit=True,repeat=False)
-        plt.show()
+         # used for the animation do not touch !
+         fig = plt.figure(1)
+         mapsList = []
+         for k in range(len(self.states)):
+             for i in range(self.width):
+                 for j in range(self.height):
+                     if self.states[k][i][j] == None :
+                         self.states[k][i][j] = colorTable[0]
+                     else :
+                         self.states[k][i][j] = colorTable[self.states[k][i][j].num]
+             img = plt.matshow(self.states[k],fignum=1)
+             mapsList.append([img])
+         anim = animation.ArtistAnimation(fig,mapsList,interval=100,blit=True,repeat=False)
+         plt.show()
+         
     def surroundings(self,pos):
         d={0:[0,[]],1:[0,[]],2:[0,[]]}
         l=[[pos[0],pos[1]-1],[pos[0],pos[1]+1],[pos[0]-1,pos[1]],[pos[0]+1,pos[1]]]
@@ -83,8 +85,11 @@ class Ocean :
     def removeDeads(self):
         c=0
         for i in self.animals:
+            if type(i)==Shark and i.energy==0:
+                i.alive=False
             if not i.alive:
                 self.animals.pop(c)
+                self.grid[i.pos[0]][i.pos[1]]=None
             c+=1
                 
                 # for i in range(0,len(self.animals)):
@@ -106,15 +111,15 @@ class Ocean :
                         if self.animals[i].energy>6:
                             self.animals[i].energy=6
                         self.animals[i].energy-=1
+                        if self.animals[i].energy==0:
+                            self.animals[i].alive=False
                     else:
                         self.animals[i].move(self,d,0)
                         self.animals[i].energy-=1
-                    if self.animals[i].energy==0:
-                        to_pop.append(i)
+                        if self.animals[i].energy==0:
+                            self.animals[i].alive=False
                 else:
                     self.animals[i].move(self,d,0)
-        for i in to_pop:
-            self.animals.pop(i)
         self.removeDeads()
                 
         self.states.append(copyMat(self.grid))
@@ -187,13 +192,17 @@ class Shark(Animal):
 
 
 nbIter = 15
-atlantic = Ocean(3,3)
+atlantic = Ocean(10,10)
 atlantic.initialize()
 for _ in range(nbIter):
     atlantic.tick()
     print(atlantic)
 atlantic.show()
 
+print("frames:", len(atlantic.states), "animals:", len(atlantic.animals), "last count:", atlantic.animalCount[-1] if atlantic.animalCount else None)
+
+
+ # textual grid
 #affiche un graph vierge, wtf
 
 
