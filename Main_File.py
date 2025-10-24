@@ -61,17 +61,15 @@ class Ocean :
         l=[[pos[0],pos[1]-1],[pos[0],pos[1]+1],[pos[0]-1,pos[1]],[pos[0]+1,pos[1]]]
         # if indice au bord, alors on remplace les valeurs de la liste par les trucs qui vont bien!
         if pos[0]==0 :
-            l[2]=[self.height,pos[1]]
-        if pos[0]==self.height:
+            l[2]=[self.width-1,pos[1]]
+        if pos[0]==self.width-1:
             l[3]=[0,pos[1]]
         if pos[1]==0 :
-            l[0]=[pos[0],self.height]
-        if pos[1]==self.height:
+            l[0]=[pos[0],self.width-1]
+        if pos[1]==self.width-1:
             l[1]=[pos[0],0]
-        print(l)
             
         for i in l:
-            print(i)
             if self.grid[i[0]][i[1]]==None:
                 d[0][0]+=1
                 d[0][1].append(i)
@@ -83,9 +81,14 @@ class Ocean :
         return d
     
     def removeDeads(self):
-        for i in range(0,len(self.animals)):
-            if not self.animals(i).alive:
-                self.animals.pop(i)
+        c=0
+        for i in self.animals:
+            if not i.alive:
+                self.animals.pop(c)
+                
+                # for i in range(0,len(self.animals)):
+            #    if not self.animals[i].alive:
+            #      self.animals.pop(i) 
             
 
     def tick(self):
@@ -137,15 +140,20 @@ class Animal :
         ocean.animals.append(ocean.grid[oldpos[0]][oldpos[1]])
 
     def move(self,ocean,d,cellType):
-        a=rd.randint(0,len(d[cellType][1])-1)
-        if type(self)==Shark and type(ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]])==Fish:
-            ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]].alive=False
-        oldpos=self.pos
-        self.pos=(d[cellType][1][a])
-        if self.rep==self.reproductionTreshold:
-            self.reproduce(self,ocean,oldpos)
+        if d[cellType][0]==0:
+            pass
         else:
-            ocean.grid[oldpos[0]][oldpos[1]]==None
+            a=rd.randint(0,d[cellType][0]-1)
+            oldpos=self.pos
+            if type(self)==Shark and type(ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]])==Fish:
+                ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]].alive=False
+            else:
+                ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]]=self
+                self.pos=(d[cellType][1][a])
+            
+            ocean.grid[oldpos[0]][oldpos[1]]=None
+            if self.rep==self.reproductionTreshold:
+                self.reproduce(ocean,oldpos)
 
 
 
@@ -174,12 +182,14 @@ class Shark(Animal):
         super().__init__(x,y)
 
 
-nbIter = 100
-atlantic = Ocean()
+nbIter = 10
+atlantic = Ocean(3,3)
 atlantic.initialize()
 for _ in range(nbIter):
     atlantic.tick()
+    print(atlantic)
 atlantic.show()
 
+#affiche un graph vierge, wtf
 
 
