@@ -85,6 +85,7 @@ class Ocean :
         for i in self.animals:
             if not i.alive:
                 self.animals.pop(c)
+            c+=1
                 
                 # for i in range(0,len(self.animals)):
             #    if not self.animals[i].alive:
@@ -93,24 +94,27 @@ class Ocean :
 
     def tick(self):
         rd.shuffle(self.animals)
+        to_pop=[]
         for i in range(0,len(self.animals)):
             if self.animals[i].alive:
                 self.animals[i].rep+=1
                 d=self.surroundings(self.animals[i].pos)
                 if type(self.animals[i])==Shark:
-                    if d[1][0]>=0:
+                    if d[1][0]>0:
                         self.animals[i].move(self,d,1)
                         self.animals[i].energy+=3
-                        if self.animals[i].energy>=6:
+                        if self.animals[i].energy>6:
                             self.animals[i].energy=6
                         self.animals[i].energy-=1
                     else:
                         self.animals[i].move(self,d,0)
                         self.animals[i].energy-=1
                     if self.animals[i].energy==0:
-                        self.animals.pop(i)
+                        to_pop.append(i)
                 else:
                     self.animals[i].move(self,d,0)
+        for i in to_pop:
+            self.animals.pop(i)
         self.removeDeads()
                 
         self.states.append(copyMat(self.grid))
@@ -147,12 +151,12 @@ class Animal :
             oldpos=self.pos
             if type(self)==Shark and type(ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]])==Fish:
                 ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]].alive=False
-            else:
-                ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]]=self
-                self.pos=(d[cellType][1][a])
+                
+            ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]]=self
+            self.pos=(d[cellType][1][a])
             
             ocean.grid[oldpos[0]][oldpos[1]]=None
-            if self.rep==self.reproductionTreshold:
+            if self.rep>=self.reproductionTreshold:
                 self.reproduce(ocean,oldpos)
 
 
@@ -182,7 +186,7 @@ class Shark(Animal):
         super().__init__(x,y)
 
 
-nbIter = 10
+nbIter = 15
 atlantic = Ocean(3,3)
 atlantic.initialize()
 for _ in range(nbIter):
