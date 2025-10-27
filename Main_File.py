@@ -16,6 +16,7 @@ class Ocean :
         self.animals = []
         self.states = []
         self.animalCount = []
+        self.anim = None
         # do not change the names of the attributes or the show function won't work
 
     def __str__(self):
@@ -34,10 +35,10 @@ class Ocean :
         for i in range(0,self.height):
             for j in range(0,self.width):
                 r=rd.randint(0,9)
-                if r<=0:
+                if r==0:
                     self.grid[i][j]=Shark(i,j)
                     self.animals.append(self.grid[i][j])
-                elif r>=6:
+                elif r>6:
                     self.grid[i][j]=Fish(i,j)
                     self.animals.append(self.grid[i][j])
         self.states.append(copyMat(self.grid))
@@ -56,7 +57,7 @@ class Ocean :
                          self.states[k][i][j] = colorTable[self.states[k][i][j].num]
              img = plt.matshow(self.states[k],fignum=1)
              mapsList.append([img])
-         anim = animation.ArtistAnimation(fig,mapsList,interval=100,blit=True,repeat=False)
+         self.anim = animation.ArtistAnimation(fig,mapsList,interval=100,blit=True,repeat=False)
          plt.show()
          
     def surroundings(self,pos):
@@ -118,7 +119,7 @@ class Ocean :
                         self.animals[i].energy-=1
                         if self.animals[i].energy==0:
                             self.animals[i].alive=False
-                else:
+                elif self.surroundings(self.animals[i].pos)[0][0]!=0:
                     self.animals[i].move(self,d,0)
         self.removeDeads()
                 
@@ -191,7 +192,7 @@ class Shark(Animal):
         super().__init__(x,y)
 
 
-nbIter = 500
+nbIter = 200
 atlantic = Ocean()
 atlantic.initialize()
 for _ in range(nbIter):
@@ -207,7 +208,7 @@ def LV():
     plt.plot(x,fishes,color='green')
     plt.plot(x,sharks,color='blue')
     plt.show()
-LV()
+#LV()
 
 print("frames:", len(atlantic.states), "animals:", len(atlantic.animals), "last count:", atlantic.animalCount[-1] if atlantic.animalCount else None)
 
