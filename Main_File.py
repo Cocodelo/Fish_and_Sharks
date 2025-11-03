@@ -16,7 +16,6 @@ class Ocean :
         self.animals = []
         self.states = []
         self.animalCount = []
-        self.anim = None
         # do not change the names of the attributes or the show function won't work
 
     def __str__(self):
@@ -57,9 +56,9 @@ class Ocean :
                          self.states[k][i][j] = colorTable[self.states[k][i][j].num]
              img = plt.matshow(self.states[k],fignum=1)
              mapsList.append([img])
-         self.anim = animation.ArtistAnimation(fig,mapsList,interval=100,blit=True,repeat=False)
+         anim = animation.ArtistAnimation(fig,mapsList,interval=100,blit=True,repeat=False)
          plt.show()
-         
+
     def surroundings(self,pos):
         d={0:[0,[]],1:[0,[]],2:[0,[]]}
         l=[[pos[0],pos[1]-1],[pos[0],pos[1]+1],[pos[0]-1,pos[1]],[pos[0]+1,pos[1]]]
@@ -72,7 +71,7 @@ class Ocean :
             l[0]=[pos[0],self.width-1]
         if pos[1]==self.width-1:
             l[1]=[pos[0],0]
-            
+
         for i in l:
             if self.grid[i[0]][i[1]]==None:
                 d[0][0]+=1
@@ -83,7 +82,7 @@ class Ocean :
                         d[j][0]+=1
                         d[j][1].append(i)
         return d
-    
+
     def removeDeads(self):
         c=0
         for i in self.animals:
@@ -93,11 +92,11 @@ class Ocean :
                 self.animals.pop(c)
                 self.grid[i.pos[0]][i.pos[1]]=None
             c+=1
-                
+
                 # for i in range(0,len(self.animals)):
             #    if not self.animals[i].alive:
-            #      self.animals.pop(i) 
-            
+            #      self.animals.pop(i)
+
 
     def tick(self):
         rd.shuffle(self.animals)
@@ -122,7 +121,7 @@ class Ocean :
                 elif self.surroundings(self.animals[i].pos)[0][0]!=0:
                     self.animals[i].move(self,d,0)
         self.removeDeads()
-                
+
         self.states.append(copyMat(self.grid))
         self.animalCount.append(self.count())
 
@@ -157,10 +156,10 @@ class Animal :
             oldpos=self.pos
             if type(self)==Shark and type(ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]])==Fish:
                 ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]].alive=False
-                
+
             ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]]=self
             self.pos=(d[cellType][1][a])
-            
+
             ocean.grid[oldpos[0]][oldpos[1]]=None
             if self.rep>=self.reproductionTreshold:
                 self.reproduce(ocean,oldpos)
@@ -177,10 +176,10 @@ class Fish(Animal):
 
     reproductionTreshold = 4
 
-###
+
 
 class Shark(Animal):
-    
+
     maximum_energy=6
     energy_start=3
     num = 2
@@ -191,24 +190,26 @@ class Shark(Animal):
         self.energy=self.energy_start
         super().__init__(x,y)
 
-
-nbIter = 200
-atlantic = Ocean()
-atlantic.initialize()
-for _ in range(nbIter):
-    atlantic.tick()
-atlantic.show()
-fishes = [atlantic.animalCount[i][0] for i in range(20,nbIter+1)]
-sharks = [atlantic.animalCount[i][1] for i in range(20,nbIter+1)]
-
-# call the function LV only after running the simulation
-
 def LV():
     x = [i for i in range(20,nbIter+1)]
     plt.plot(x,fishes,color='green')
     plt.plot(x,sharks,color='blue')
     plt.show()
-#LV()
+
+
+nbIter = 500
+atlantic = Ocean()
+atlantic.initialize()
+for _ in range(nbIter):
+    atlantic.tick()
+
+atlantic.show()
+
+fishes = [atlantic.animalCount[i][0] for i in range(20,nbIter+1)]
+sharks = [atlantic.animalCount[i][1] for i in range(20,nbIter+1)]
+LV()
+
+# call the function LV only after running the simulation
 
 print("frames:", len(atlantic.states), "animals:", len(atlantic.animals), "last count:", atlantic.animalCount[-1] if atlantic.animalCount else None)
 
