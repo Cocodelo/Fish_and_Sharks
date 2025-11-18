@@ -58,7 +58,7 @@ class Ocean :
              mapsList.append([img])
          anim = animation.ArtistAnimation(fig,mapsList,interval=100,blit=True,repeat=False)
          plt.show()
-
+         
     def surroundings(self,pos):
         d={0:[0,[]],1:[0,[]],2:[0,[]]}
         l=[[pos[0],pos[1]-1],[pos[0],pos[1]+1],[pos[0]-1,pos[1]],[pos[0]+1,pos[1]]]
@@ -71,7 +71,7 @@ class Ocean :
             l[0]=[pos[0],self.width-1]
         if pos[1]==self.width-1:
             l[1]=[pos[0],0]
-
+            
         for i in l:
             if self.grid[i[0]][i[1]]==None:
                 d[0][0]+=1
@@ -82,48 +82,49 @@ class Ocean :
                         d[j][0]+=1
                         d[j][1].append(i)
         return d
-
+    
     def removeDeads(self):
-        c=0
-        for i in self.animals:
-            if type(i)==Shark and i.energy==0:
-                i.alive=False
-            if not i.alive:
-                self.animals.pop(c)
-                self.grid[i.pos[0]][i.pos[1]]=None
-            c+=1
+        l=[]
+        for i in self.grid:
+            for j in i:
+                if type(j) == Shark and j.energy==0:
+                    j.alive = False
+                if j != None and not j.alive:
+                        self.grid[j.pos[0]][j.pos[1]]=None
+                elif j != None and j.alive:
+                            l.append(j)
+        self.animals=l
 
-                # for i in range(0,len(self.animals)):
-            #    if not self.animals[i].alive:
-            #      self.animals.pop(i)
-
-
+            
     def tick(self):
+        print("begin tick ", self.count())
         rd.shuffle(self.animals)
-        for i in range(0,len(self.animals)):
+        for i in range(0, len(self.animals)):
             if self.animals[i].alive:
-                self.animals[i].rep+=1
+                self.animals[i].rep += 1
                 d=self.surroundings(self.animals[i].pos)
-                if type(self.animals[i])==Shark:
+                if type(self.animals[i]) == Shark:
                     if d[1][0]>0:
-                        self.animals[i].move(self,d,1)
-                        self.animals[i].energy+=3
-                        if self.animals[i].energy>6:
-                            self.animals[i].energy=6
-                        self.animals[i].energy-=1
-                        if self.animals[i].energy==0:
-                            self.animals[i].alive=False
-                    else:
-                        self.animals[i].move(self,d,0)
-                        self.animals[i].energy-=1
-                        if self.animals[i].energy==0:
-                            self.animals[i].alive=False
-                elif self.surroundings(self.animals[i].pos)[0][0]!=0:
-                    self.animals[i].move(self,d,0)
+                        self.animals[i].move(self, d, 1)
+                        self.animals[i].energy += 3
+                        if self.animals[i].energy > 6:
+                            self.animals[i].energy = 6
+                        self.animals[i].energy -= 1
+                        if self.animals[i].energy == 0:
+                            self.animals[i].alive = False
+                    elif d[0][0]!=0:
+                        self.animals[i].move(self, d, 0)
+                        self.animals[i].energy -= 1
+                        if self.animals[i].energy == 0:
+                            self.animals[i].alive = False
+                elif d[0][0]!=0:
+                    self.animals[i].move(self, d, 0)
+        print("with deads ", self.count())
         self.removeDeads()
-
+        print("deads removed ", self.count())
         self.states.append(copyMat(self.grid))
         self.animalCount.append(self.count())
+        print("end tick ", self.count())
 
     def count(self):
     # used for plotting the number of fishes and sharks
@@ -138,31 +139,33 @@ class Ocean :
 
 class Animal :
 
-    def __init__(self,x,y):
-        self.pos=(x,y)
-        self.rep=0
-        self.alive=True
+    def __init__(self, x, y):
+        self.pos = (x,y)
+        self.rep = 0
+        self.alive = True
 
-    def reproduce(self,ocean,oldpos):
-        self.rep=0
-        ocean.grid[oldpos[0]][oldpos[1]]=type(self)(oldpos[0],oldpos[1])
-        ocean.animals.append(ocean.grid[oldpos[0]][oldpos[1]])
+    def reproduce(self, ocean, oldpos):
+            self.rep = 0
+            ocean.grid[oldpos[0]][oldpos[1]] = type(self)(oldpos[0],oldpos[1])
+            ocean.animals.append(ocean.grid[oldpos[0]][oldpos[1]])
 
-    def move(self,ocean,d,cellType):
-        if d[cellType][0]==0:
+    def move(self, ocean, d, cellType):
+        if d[cellType][0] == 0:
             pass
         else:
-            a=rd.randint(0,d[cellType][0]-1)
-            oldpos=self.pos
-            if type(self)==Shark and type(ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]])==Fish:
-                ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]].alive=False
+            a = rd.randint(0, d[cellType][0] - 1)
+            oldpos = self.pos
+            if type(self) == Shark and type(ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]]) == Fish:
+                ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]].alive = False
 
-            ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]]=self
+            ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]] = None
+            ocean.grid[d[cellType][1][a][0]][d[cellType][1][a][1]] = self
             self.pos=(d[cellType][1][a])
-
-            ocean.grid[oldpos[0]][oldpos[1]]=None
-            if self.rep>=self.reproductionTreshold:
-                self.reproduce(ocean,oldpos)
+            ocean.grid[oldpos[0]][oldpos[1]] = None
+            if self.rep >= self.reproductionTreshold:
+                
+                self.reproduce(ocean, oldpos)
+                #print("after reproduce ", ocean.count())
 
 
 
@@ -176,25 +179,19 @@ class Fish(Animal):
 
     reproductionTreshold = 4
 
-
+###
 
 class Shark(Animal):
-
-    maximum_energy=6
-    energy_start=3
+    
+    maximum_energy = 6
+    energy_start = 3
     num = 2
 
     reproductionTreshold = 12
-    def __init__(self,x,y):
+    def __init__(self, x, y):
 
         self.energy=self.energy_start
-        super().__init__(x,y)
-
-def LV():
-    x = [i for i in range(20,nbIter+1)]
-    plt.plot(x,fishes,color='green')
-    plt.plot(x,sharks,color='blue')
-    plt.show()
+        super().__init__(x, y)
 
 
 nbIter = 500
@@ -202,17 +199,24 @@ atlantic = Ocean()
 atlantic.initialize()
 for _ in range(nbIter):
     atlantic.tick()
-
 atlantic.show()
-
 fishes = [atlantic.animalCount[i][0] for i in range(20,nbIter+1)]
 sharks = [atlantic.animalCount[i][1] for i in range(20,nbIter+1)]
-LV()
 
 # call the function LV only after running the simulation
+
+def LV():
+    
+    x = [i for i in range(20,nbIter+1)]
+    plt.plot(x,fishes,color='green')
+    plt.plot(x,sharks,color='blue')
+    
+    plt.show()
+
+LV()
 
 print("frames:", len(atlantic.states), "animals:", len(atlantic.animals), "last count:", atlantic.animalCount[-1] if atlantic.animalCount else None)
 
 
  # textual grid
-#affiche un graph vierge, wtf
+
