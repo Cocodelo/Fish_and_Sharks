@@ -31,15 +31,19 @@ class Ocean :
         return res
 
     def initialize(self):
-        for i in range(0,self.height):
-            for j in range(0,self.width):
-                r=rd.randint(0,9)
-                if r==0:
-                    self.grid[i][j]=Shark(i,j)
+        for i in range(0, self.width):
+            for j in range(0, self.height):
+            #Run through the grid
+                r = rd.randint(0, 9)
+                if r == 0:
+                    self.grid[i][j]=Shark(i, j)
                     self.animals.append(self.grid[i][j])
-                elif r>6:
+                    #Create a shark with 10% probability
+                elif r > 6:
                     self.grid[i][j]=Fish(i,j)
                     self.animals.append(self.grid[i][j])
+                    #Create a Fish with 40% probability
+                #Else, leave it blank
         self.states.append(copyMat(self.grid))
         self.animalCount.append(self.count())
 
@@ -199,7 +203,7 @@ atlantic = Ocean()
 atlantic.initialize()
 for _ in range(nbIter):
     atlantic.tick()
-atlantic.show()
+#atlantic.show()
 fishes = [atlantic.animalCount[i][0] for i in range(20,nbIter+1)]
 sharks = [atlantic.animalCount[i][1] for i in range(20,nbIter+1)]
 
