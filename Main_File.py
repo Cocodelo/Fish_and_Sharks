@@ -65,17 +65,7 @@ class Ocean :
          
     def surroundings(self,pos):
         d={0:[0,[]],1:[0,[]],2:[0,[]]}
-        l=[[pos[0],pos[1]-1],[pos[0],pos[1]+1],[pos[0]-1,pos[1]],[pos[0]+1,pos[1]]] #Create a list of the four positions around the considered position.
-        
-        #Tests in case the position is on a edge, and modify the list adequately.
-        if pos[0]==0 :
-            l[2]=[self.width-1,pos[1]]
-        if pos[0]==self.width-1:
-            l[3]=[0,pos[1]]
-        if pos[1]==0 :
-            l[0]=[pos[0],self.width-1]
-        if pos[1]==self.width-1:
-            l[1]=[pos[0],0]
+        l=[[pos[0],(pos[1]-1)%self.height],[pos[0],(pos[1]+1)%self.height],[(pos[0]-1)%self.width,pos[1]],[(pos[0]+1)%self.width,pos[1]]]
 
         #Class correctly the different positins in the dictionary    
         for i in l:
